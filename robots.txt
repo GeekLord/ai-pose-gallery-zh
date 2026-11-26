@@ -1,2 +1,4 @@
 User-agent: *
 Allow: /
+
+Sitemap: https://pose.geeklord.com/sitemap.xml

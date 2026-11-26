@@ -1,4 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- No deployment domain yet: add your own URLs here once this fork is hosted. -->
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>https://pose.geeklord.com/</loc><lastmod>2026-11-26</lastmod></url>
+  <url><loc>https://pose.geeklord.com/poses</loc><lastmod>2026-11-26</lastmod></url>
+  <url><loc>https://pose.geeklord.com/costumes</loc><lastmod>2026-11-26</lastmod></url>
+  <url><loc>https://pose.geeklord.com/portraits</loc><lastmod>2026-11-26</lastmod></url>
+  <url><loc>https://pose.geeklord.com/studio</loc><lastmod>2026-11-26</lastmod></url>
+  <url><loc>https://pose.geeklord.com/guide</loc><lastmod>2026-11-26</lastmod></url>
 </urlset>
