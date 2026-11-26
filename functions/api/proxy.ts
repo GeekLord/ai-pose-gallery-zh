@@ -22,6 +22,10 @@ const DEFAULT_ALLOWED_ORIGINS = [
   'https://generativelanguage.googleapis.com', // Google Gemini
   'https://api.openai.com', // OpenAI
   'https://api.pixai.art', // PixAI
+  'https://queue.fal.run', // FAL (fal.ai) 队列 API
+  'https://api.runware.ai', // Runware AI
+  'https://engine.prod.bria-api.com', // Bria AI
+  'https://api.meta.ai', // Meta Model API (Muse Image)
 ]
 
 function matchOriginRule(target: URL, rawRule: string): boolean {
@@ -118,7 +122,7 @@ export const handleProxy = async (context: { request: Request; env?: ProxyEnv })
   }
 
   const forwardHeaders = new Headers()
-  for (const key of ['content-type', 'authorization', 'x-goog-api-key', 'x-dashscope-async']) {
+  for (const key of ['content-type', 'authorization', 'x-goog-api-key', 'x-dashscope-async', 'api_token']) {
     const val = request.headers.get(key)
     if (val) forwardHeaders.set(key, val)
   }

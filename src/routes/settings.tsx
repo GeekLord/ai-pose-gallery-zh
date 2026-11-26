@@ -28,7 +28,7 @@ export const Route = createFileRoute('/settings')({
   component: SettingsPage,
 })
 
-const PROVIDER_ORDER: ImageProviderId[] = ['gemini', 'gpt', 'qwen', 'doubao', 'pixai', 'comfyui']
+const PROVIDER_ORDER: ImageProviderId[] = ['gemini', 'gpt', 'qwen', 'doubao', 'pixai', 'fal', 'runware', 'bria', 'meta', 'custom', 'comfyui']
 
 function SettingsPage() {
   const { apiConfig, updateApiConfig, updateProviderConfig, comfyConnection } = useStudio()
@@ -71,7 +71,7 @@ function SettingsPage() {
       />
 
       {/* 五大协议切换标签 */}
-      <div className="grid grid-cols-2 gap-2 sm:grid-cols-5">
+      <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4">
         {PROVIDER_ORDER.map((id) => {
           const itemMeta = PROVIDER_META[id]
           const isActive = pid === id
@@ -154,7 +154,7 @@ function SettingsPage() {
             type={pid === 'comfyui' ? 'text' : 'url'}
             value={pCfg.baseUrl}
             onChange={(e) => updateProviderConfig(pid, { baseUrl: e.target.value })}
-            placeholder={meta.defaultBaseUrl}
+            placeholder={pid === 'custom' ? t('https://api.example.com/v1（你的 OpenAI 兼容接口）') : meta.defaultBaseUrl}
           />
         </Field>
 
@@ -219,6 +219,11 @@ function SettingsPage() {
 
       {/* 全局传输设置 */}
       {pid === 'pixai' && <p className="text-sm text-muted-foreground">{t('支持 Tsubaki.3 和 Tsubaki.3 Flash，每次输出一张。人像、服装、姿势各一图，按原始图片上传；默认启用本站代理。Key 随请求发送到本站代理与 PixAI，请仅在可信部署上使用。')}</p>}
+      {pid === 'fal' && <p className="text-sm text-muted-foreground">{t('FAL 走队列接口：提交后自动轮询出图。编辑类模型（如 nano-banana/edit、Kontext）会收到全部参考图；文生图模型（如 FLUX）只用提示词。默认启用本站代理转发到 queue.fal.run。')}</p>}
+      {pid === 'runware' && <p className="text-sm text-muted-foreground">{t('Runware 走同步 imageInference：参考图通过 inputs.referenceImages 传入（最多 16 张，取决于模型）。字段按模型区分，自定义 AIR 模型若报错请核对该模型的字段要求。')}</p>}
+      {pid === 'bria' && <p className="text-sm text-muted-foreground">{t('Bria 使用 v2 接口与 api_token 请求头：有参考图时走 /v2/image/edit（最多 4 张），无参考图时走 /v2/image/generate。模型固定为 Fibo 2。')}</p>}
+      {pid === 'meta' && <p className="text-sm text-muted-foreground">{t('Meta Model API 与 OpenAI 接口兼容：有参考图时走 /v1/images/edits，无参考图时走 /v1/images/generations，模型为 muse-image-1.0。')}</p>}
+      {pid === 'custom' && <p className="text-sm text-muted-foreground">{t('自定义 API 需兼容 OpenAI 接口形状：/v1/images/edits (JSON) 或 /v1/chat/completions。Base URL 必填；走本站代理时目标域名需先加入服务端白名单 PROXY_ALLOWED_ORIGINS，否则请关闭代理直连。')}</p>}
       {pid !== 'comfyui' && (
         <Section title={t('全局请求选项')}>
           {pid !== 'pixai' && <Field label={t('参考图传参方式')}>

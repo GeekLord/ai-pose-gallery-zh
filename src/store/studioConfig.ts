@@ -5,7 +5,7 @@ import { DEFAULT_PIXAI_PARAMS, PIXAI_MODEL, PIXAI_MODELS } from '@/services/pixa
 const COMFY_CONFIG_VERSION = 3
 
 export const shouldEnableProxyByDefault = (provider?: ImageProviderId) =>
-  provider === 'qwen' || provider === 'doubao' || provider === 'pixai'
+  provider === 'qwen' || provider === 'doubao' || provider === 'pixai' || provider === 'fal' || provider === 'runware' || provider === 'bria' || provider === 'meta'
 
 export const DEFAULT_API_CONFIG: ApiConfig = {
   activeProvider: 'gemini',
@@ -45,8 +45,18 @@ export const DEFAULT_API_CONFIG: ApiConfig = {
       model: PROVIDER_META.comfyui.models[0].value,
       customModel: '',
     },
+    fal: { baseUrl: PROVIDER_META.fal.defaultBaseUrl, apiKey: '', model: PROVIDER_META.fal.models[0].value, customModel: '' },
+    runware: { baseUrl: PROVIDER_META.runware.defaultBaseUrl, apiKey: '', model: PROVIDER_META.runware.models[0].value, customModel: '' },
+    bria: { baseUrl: PROVIDER_META.bria.defaultBaseUrl, apiKey: '', model: PROVIDER_META.bria.models[0].value, customModel: '' },
+    meta: { baseUrl: PROVIDER_META.meta.defaultBaseUrl, apiKey: '', model: PROVIDER_META.meta.models[0].value, customModel: '' },
+    custom: { baseUrl: '', apiKey: '', model: 'custom', customModel: '' },
   },
   pixaiParams: { ...DEFAULT_PIXAI_PARAMS },
+  falParams: { aspectRatio: '3:4', outputFormat: 'png' },
+  runwareParams: { resolution: '2K', outputFormat: 'PNG' },
+  briaParams: { aspectRatio: '3:4' },
+  metaParams: { size: '1024x1536', outputFormat: 'webp' },
+  customParams: { endpointMode: 'images_edits_json' },
   gptParams: {
     endpointMode: 'images_edits_json',
     size: '1024x1536',
@@ -135,6 +145,11 @@ export function mergeStoredConfig(raw: unknown): ApiConfig {
       qwen: { ...DEFAULT_API_CONFIG.providers.qwen, ...obj.providers?.qwen },
       doubao: { ...DEFAULT_API_CONFIG.providers.doubao, ...obj.providers?.doubao },
       pixai: { ...DEFAULT_API_CONFIG.providers.pixai, ...obj.providers?.pixai, model: PIXAI_MODELS.some((entry) => entry.value === obj.providers?.pixai?.model) ? obj.providers!.pixai.model : PIXAI_MODEL, customModel: '' },
+      fal: { ...DEFAULT_API_CONFIG.providers.fal, ...obj.providers?.fal },
+      runware: { ...DEFAULT_API_CONFIG.providers.runware, ...obj.providers?.runware },
+      bria: { ...DEFAULT_API_CONFIG.providers.bria, ...obj.providers?.bria },
+      meta: { ...DEFAULT_API_CONFIG.providers.meta, ...obj.providers?.meta },
+      custom: { ...DEFAULT_API_CONFIG.providers.custom, ...obj.providers?.custom },
       comfyui: comfy.provider,
     },
     gptParams: { ...DEFAULT_API_CONFIG.gptParams, ...obj.gptParams },
@@ -142,6 +157,11 @@ export function mergeStoredConfig(raw: unknown): ApiConfig {
     qwenParams: { ...DEFAULT_API_CONFIG.qwenParams, ...obj.qwenParams },
     doubaoParams: { ...DEFAULT_API_CONFIG.doubaoParams, ...obj.doubaoParams },
     pixaiParams: { ...DEFAULT_PIXAI_PARAMS, ...obj.pixaiParams, mode: obj.providers?.pixai?.model !== '2050048243034896798' && ['default', 'pro', 'ultra'].includes(obj.pixaiParams?.mode || '') ? obj.pixaiParams!.mode : 'default' },
+    falParams: { ...DEFAULT_API_CONFIG.falParams, ...obj.falParams },
+    runwareParams: { ...DEFAULT_API_CONFIG.runwareParams, ...obj.runwareParams },
+    briaParams: { ...DEFAULT_API_CONFIG.briaParams, ...obj.briaParams },
+    metaParams: { ...DEFAULT_API_CONFIG.metaParams, ...obj.metaParams },
+    customParams: { ...DEFAULT_API_CONFIG.customParams, ...obj.customParams },
     comfyuiParams: comfy.params,
   }
 }

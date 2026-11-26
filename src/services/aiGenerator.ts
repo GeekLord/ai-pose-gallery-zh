@@ -93,6 +93,60 @@ export const PROVIDER_META: Record<
     docUrl: 'https://platform.pixai.art/en/docs/api-v2/image/createImage',
     models: PIXAI_MODELS,
   },
+  fal: {
+    id: 'fal',
+    name: 'FAL (fal.ai)',
+    shortName: 'FAL',
+    defaultBaseUrl: 'https://queue.fal.run',
+    docUrl: 'https://fal.ai/docs',
+    models: [
+      { value: 'fal-ai/nano-banana/edit', label: 'fal-ai/nano-banana/edit' },
+      { value: 'fal-ai/flux-pro/kontext', label: 'fal-ai/flux-pro/kontext' },
+      { value: 'fal-ai/qwen-image-edit-plus', label: 'fal-ai/qwen-image-edit-plus' },
+      { value: 'fal-ai/flux/dev', label: 'fal-ai/flux/dev' },
+      { value: 'fal-ai/flux/schnell', label: 'fal-ai/flux/schnell' },
+      { value: 'custom', label: '自定义模型 ID' },
+    ],
+  },
+  runware: {
+    id: 'runware',
+    name: 'Runware AI',
+    shortName: 'Runware',
+    defaultBaseUrl: 'https://api.runware.ai/v1',
+    docUrl: 'https://runware.ai/docs',
+    models: [
+      { value: 'minimax:h3@image', label: 'minimax:h3@image' },
+      { value: 'runware:101@1', label: 'runware:101@1' },
+      { value: 'custom', label: '自定义模型 ID' },
+    ],
+  },
+  bria: {
+    id: 'bria',
+    name: 'Bria AI',
+    shortName: 'Bria',
+    defaultBaseUrl: 'https://engine.prod.bria-api.com',
+    docUrl: 'https://docs.bria.ai',
+    models: [{ value: 'fibo-2', label: 'Fibo 2 (v2)' }],
+  },
+  meta: {
+    id: 'meta',
+    name: 'Meta Muse Image',
+    shortName: 'Meta',
+    defaultBaseUrl: 'https://api.meta.ai/v1',
+    docUrl: 'https://dev.meta.ai/docs/image-generation',
+    models: [
+      { value: 'muse-image-1.0', label: 'muse-image-1.0' },
+      { value: 'custom', label: '自定义模型 ID' },
+    ],
+  },
+  custom: {
+    id: 'custom',
+    name: '自定义 API (OpenAI 兼容)',
+    shortName: 'Custom',
+    defaultBaseUrl: '',
+    docUrl: 'https://platform.openai.com/docs/guides/image-generation',
+    models: [{ value: 'custom', label: '自定义模型 ID' }],
+  },
   comfyui: {
     id: 'comfyui',
     name: '本地 ComfyUI',
@@ -422,6 +476,10 @@ async function smartFetch(
 }
 
 function extractUniversalImage(json: any): string | null {
+  // 0. Runware: data[0].imageURL; Bria v2: result.image_url
+  if (json?.data?.[0]?.imageURL) return json.data[0].imageURL
+  if (json?.result?.image_url) return json.result.image_url
+
   // 1. OpenAI / Doubao Seedream standard: data[0].b64_json or data[0].url
   if (json?.data?.[0]?.b64_json) return `data:image/png;base64,${json.data[0].b64_json}`
   if (json?.data?.[0]?.url) return json.data[0].url
@@ -1544,6 +1602,87 @@ async function generateWithComfyUi(params: {
   } finally { socket.close() }
 }
 
+const sleepMs = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms))
+
+/** FAL (fal.ai) 队列协议：提交 -> 轮询 status_url -> 读取 response_url 的 images[0].url。 */
+async function generateWithFal(params: {
+  recipe: RecipeState
+  prompt: string
+  config: ApiConfig
+  onProgress?: (p: GenerationProgress) => void
+  signal?: AbortSignal
+}): Promise<{ imageUrl: string; modelUsed: string; providerUsed: ImageProviderId }> {
+  const { recipe, prompt, config, onProgress } = params
+  const signal = params.signal
+  const pCfg = config.providers.fal
+  const apiKey = pCfg.apiKey.trim()
+  const model = pCfg.model === 'custom' ? pCfg.customModel.trim() : pCfg.model
+  if (!model) throw new Error('请选择或填写有效的模型名称')
+  const baseUrl = (pCfg.baseUrl.trim() || PROVIDER_META.fal.defaultBaseUrl).replace(/\/+$/, '')
+
+  const rawSources = [
+    recipe.portrait && (recipe.portrait.原图 || recipe.portrait.缩略图),
+    recipe.costume && (recipe.costume.预览图 || recipe.costume.原图 || recipe.costume.缩略图),
+    recipe.pose && poseImagePath(recipe.pose),
+    ...(recipe.extraImages || []).map((x) => x.url),
+  ].filter(Boolean) as string[]
+  if (!rawSources.length) throw new Error('请先选择或上传至少 1 张参考图')
+
+  const refs =
+    config.imagePassMode === 'base64' || config.sendStitchedSheet
+      ? await Promise.all(rawSources.map(srcToPngDataUrl))
+      : rawSources.map(toPublicHttpsUrl)
+  const allRefs: string[] = config.sendStitchedSheet ? [...refs, await stitchRecipeCanvas(recipe)] : refs
+
+  const isEditModel = /edit|kontext|nano-banana|image-to-image|i2i/i.test(model)
+  const payload: Record<string, any> = {
+    prompt,
+    num_images: 1,
+    output_format: config.falParams.outputFormat,
+  }
+  if (isEditModel) {
+    payload.image_urls = allRefs
+    payload.aspect_ratio = config.falParams.aspectRatio
+  } else {
+    payload.image_size = 'portrait_4_3'
+  }
+
+  const headers = { 'Content-Type': 'application/json', Authorization: `Key ${apiKey}` }
+  onProgress?.({ stage: 'queue', message: '正在提交 FAL 任务…' })
+  const submitRes = await smartFetch(`${baseUrl}/${model}`, { method: 'POST', headers, body: JSON.stringify(payload) }, config.useProxy)
+  const submitJson: any = await submitRes.json().catch(() => null)
+  if (!submitRes.ok) {
+    throw new Error(`[FAL] ${submitJson?.detail || submitJson?.error?.message || `提交失败 (HTTP ${submitRes.status})`}`)
+  }
+  const requestId = submitJson?.request_id
+  if (!requestId) throw new Error('[FAL] 提交成功但未返回 request_id')
+  const statusUrl = submitJson.status_url || `${baseUrl}/${model}/requests/${requestId}/status`
+  const responseUrl = submitJson.response_url || `${baseUrl}/${model}/requests/${requestId}`
+
+  const deadline = Date.now() + 300000
+  for (;;) {
+    signal?.throwIfAborted()
+    if (Date.now() > deadline) throw new Error(`[FAL] 任务 ${requestId} 查询超时（5 分钟）`)
+    await sleepMs(2500)
+    signal?.throwIfAborted()
+    const stRes = await smartFetch(statusUrl, { method: 'GET', headers: { Authorization: `Key ${apiKey}` } }, config.useProxy)
+    const stJson: any = await stRes.json().catch(() => null)
+    if (!stRes.ok) throw new Error(`[FAL] 状态查询失败 (HTTP ${stRes.status})`)
+    if (stJson?.status === 'COMPLETED') break
+    if (stJson?.status === 'IN_QUEUE') onProgress?.({ stage: 'queue', message: `FAL 排队中（位置 ${stJson.queue_position ?? '-'})…` })
+    else if (stJson?.status === 'IN_PROGRESS') onProgress?.({ stage: 'running', message: 'FAL 生成中…' })
+    else throw new Error(`[FAL] 未知任务状态：${String(stJson?.status)}`)
+  }
+
+  onProgress?.({ stage: 'download', message: 'FAL 生成完成，正在读取结果…' })
+  const outRes = await smartFetch(responseUrl, { method: 'GET', headers: { Authorization: `Key ${apiKey}` } }, config.useProxy)
+  const outJson: any = await outRes.json().catch(() => null)
+  if (!outRes.ok) throw new Error(`[FAL] 结果读取失败 (HTTP ${outRes.status})`)
+  const imageUrl = outJson?.images?.[0]?.url
+  if (!imageUrl) throw new Error('[FAL] 任务完成但未解析到图片输出')
+  return { imageUrl, modelUsed: model, providerUsed: 'fal' }
+}
+
 export async function generateCharacterImage(params: {
   recipe: RecipeState
   prompt: string
@@ -1563,6 +1702,8 @@ export async function generateCharacterImage(params: {
   }
 
   if (provider === 'pixai') return generateWithPixAi(params)
+
+  if (provider === 'fal') return generateWithFal(params)
 
   const rawSources = [
     recipe.portrait && (recipe.portrait.原图 || recipe.portrait.缩略图),
@@ -1839,7 +1980,7 @@ export async function generateCharacterImage(params: {
   // =========================================================================
   // 协议 4: 字节火山方舟 Doubao Seedream (/api/v3/images/generations)
   // =========================================================================
-  else {
+  else if (provider === 'doubao') {
     const db = config.doubaoParams
     let endpoint = baseUrl
     if (!endpoint.endsWith('/images/generations')) {
@@ -1870,6 +2011,145 @@ export async function generateCharacterImage(params: {
       },
       config.useProxy
     )
+    json = await res.json()
+  }
+
+  // =========================================================================
+  // 协议 5: Runware AI (POST /v1, imageInference 任务数组, 同步返回 imageURL)
+  // =========================================================================
+  else if (provider === 'runware') {
+    const rw = config.runwareParams
+    const endpoint = baseUrl.endsWith('/v1') ? baseUrl : `${baseUrl}/v1`
+    const task: Record<string, any> = {
+      taskType: 'imageInference',
+      taskUUID: crypto.randomUUID(),
+      model,
+      positivePrompt: prompt,
+      deliveryMethod: 'sync',
+      numberResults: 1,
+      outputType: 'URL',
+      outputFormat: rw.outputFormat,
+      resolution: rw.resolution,
+    }
+    if (allImageRefs.length) task.inputs = { referenceImages: allImageRefs }
+    res = await smartFetch(
+      endpoint,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${apiKey}` },
+        body: JSON.stringify([task]),
+      },
+      config.useProxy
+    )
+    json = await res.json()
+    if (Array.isArray(json?.errors) && json.errors.length) {
+      throw new Error(`[Runware] ${json.errors[0]?.message || JSON.stringify(json.errors[0]).slice(0, 260)}`)
+    }
+  }
+  // =========================================================================
+  // 协议 6: Bria AI (Fibo 2, /v2/image/edit 或 /v2/image/generate, api_token 头)
+  // =========================================================================
+  else if (provider === 'bria') {
+    const br = config.briaParams
+    const root = baseUrl.replace(/\/v2$/, '')
+    const refs = allImageRefs.slice(0, 4)
+    const endpoint = refs.length ? `${root}/v2/image/edit` : `${root}/v2/image/generate`
+    const body: Record<string, any> = { prompt, aspect_ratio: br.aspectRatio, sync: true }
+    if (refs.length) body.images = refs
+    res = await smartFetch(
+      endpoint,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', api_token: apiKey },
+        body: JSON.stringify(body),
+      },
+      config.useProxy
+    )
+    json = await res.json()
+    // 个别端点忽略 sync 时返回 status_url，轮询至出图
+    if (res.ok && !json?.result?.image_url && json?.status_url) {
+      const deadline = Date.now() + 240000
+      while (Date.now() < deadline) {
+        await sleepMs(3000)
+        params.signal?.throwIfAborted()
+        const poll = await smartFetch(json.status_url, { method: 'GET', headers: { api_token: apiKey } }, config.useProxy)
+        const pj: any = await poll.json().catch(() => null)
+        if (pj?.result?.image_url || pj?.image_url) {
+          json = pj
+          break
+        }
+        if (pj?.status === 'failed' || pj?.status === 'error') {
+          throw new Error(`[Bria] 任务失败：${JSON.stringify(pj).slice(0, 260)}`)
+        }
+      }
+    }
+  }
+  // =========================================================================
+  // 协议 7: Meta Model API (Muse Image, OpenAI 兼容 /v1/images/*)
+  // =========================================================================
+  else if (provider === 'meta') {
+    const mp = config.metaParams
+    const v1 = baseUrl.endsWith('/v1') ? baseUrl : `${baseUrl}/v1`
+    const payload: Record<string, any> = {
+      model,
+      prompt,
+      size: mp.size,
+      output_format: mp.outputFormat,
+      n: 1,
+    }
+    if (allImageRefs.length) payload.images = allImageRefs.map((ref) => ({ image_url: ref }))
+    res = await smartFetch(
+      `${v1}/images/${allImageRefs.length ? 'edits' : 'generations'}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${apiKey}` },
+        body: JSON.stringify(payload),
+      },
+      config.useProxy
+    )
+    json = await res.json()
+  }
+  // =========================================================================
+  // 协议 8: 自定义 API (OpenAI 兼容: images/edits JSON 或 chat/completions)
+  // =========================================================================
+  else {
+    const cp = config.customParams
+    const rawBase = pCfg.baseUrl.trim().replace(/\/+$/, '')
+    if (!rawBase) throw new Error('请先在接口配置中填写自定义 API 的 Base URL')
+    const v1 = rawBase.endsWith('/v1') ? rawBase : `${rawBase}/v1`
+    if (cp.endpointMode === 'images_edits_json') {
+      res = await smartFetch(
+        `${v1}/images/edits`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${apiKey}` },
+          body: JSON.stringify({
+            model,
+            prompt,
+            images: allImageRefs.map((ref) => ({ image_url: ref })),
+          }),
+        },
+        config.useProxy
+      )
+    } else {
+      const content = [
+        { type: 'text', text: prompt },
+        ...allImageRefs.map((ref) => ({ type: 'image_url', image_url: { url: ref } })),
+      ]
+      res = await smartFetch(
+        `${v1}/chat/completions`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${apiKey}` },
+          body: JSON.stringify({
+            model,
+            messages: [{ role: 'user', content }],
+            modalities: ['text', 'image'],
+          }),
+        },
+        config.useProxy
+      )
+    }
     json = await res.json()
   }
 

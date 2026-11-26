@@ -32,6 +32,11 @@ import {
 } from '@/services/aiGenerator'
 import type {
   ApiConfig,
+  BriaParams,
+  CustomParams,
+  FalParams,
+  MetaParams,
+  RunwareParams,
   ComfyUiParams,
   CostumeItem,
   DoubaoParams,
@@ -101,6 +106,11 @@ interface StudioContextValue {
   updateApiConfig: (patch: Partial<ApiConfig>) => void
   updateProviderConfig: (provider: ImageProviderId, patch: Partial<ProviderEndpointConfig>) => void
   updatePixAiParams: (patch: Partial<PixAiParams>) => void
+  updateFalParams: (patch: Partial<FalParams>) => void
+  updateRunwareParams: (patch: Partial<RunwareParams>) => void
+  updateBriaParams: (patch: Partial<BriaParams>) => void
+  updateMetaParams: (patch: Partial<MetaParams>) => void
+  updateCustomParams: (patch: Partial<CustomParams>) => void
   updateGptParams: (patch: Partial<GptParams>) => void
   updateGeminiParams: (patch: Partial<GeminiParams>) => void
   updateQwenParams: (patch: Partial<QwenParams>) => void
@@ -438,6 +448,26 @@ export function StudioProvider({ children }: { children: ReactNode }) {
     setApiConfig((prev) => ({ ...prev, pixaiParams: { ...prev.pixaiParams, ...patch } }))
   }
 
+  const updateFalParams = (patch: Partial<FalParams>) => {
+    setApiConfig((prev) => ({ ...prev, falParams: { ...prev.falParams, ...patch } }))
+  }
+
+  const updateRunwareParams = (patch: Partial<RunwareParams>) => {
+    setApiConfig((prev) => ({ ...prev, runwareParams: { ...prev.runwareParams, ...patch } }))
+  }
+
+  const updateBriaParams = (patch: Partial<BriaParams>) => {
+    setApiConfig((prev) => ({ ...prev, briaParams: { ...prev.briaParams, ...patch } }))
+  }
+
+  const updateMetaParams = (patch: Partial<MetaParams>) => {
+    setApiConfig((prev) => ({ ...prev, metaParams: { ...prev.metaParams, ...patch } }))
+  }
+
+  const updateCustomParams = (patch: Partial<CustomParams>) => {
+    setApiConfig((prev) => ({ ...prev, customParams: { ...prev.customParams, ...patch } }))
+  }
+
   const updateGptParams = (patch: Partial<GptParams>) => {
     setApiConfig((prev) => ({ ...prev, gptParams: { ...prev.gptParams, ...patch } }))
   }
@@ -652,6 +682,11 @@ export function StudioProvider({ children }: { children: ReactNode }) {
         updateApiConfig,
         updateProviderConfig,
         updatePixAiParams,
+        updateFalParams,
+        updateRunwareParams,
+        updateBriaParams,
+        updateMetaParams,
+        updateCustomParams,
         updateGptParams,
         updateGeminiParams,
         updateQwenParams,

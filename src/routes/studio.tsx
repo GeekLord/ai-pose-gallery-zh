@@ -64,15 +64,20 @@ import { getGptInputFidelity } from '@/lib/gptImageCapabilities'
 import type { RandomScope, ReferenceSlot } from '@/lib/randomRecipe'
 import { selectCostumeView } from '@/lib/costumeSources'
 import type {
+  BriaParams,
   ComfyUiParams,
+  CustomParams,
   DoubaoParams,
+  FalParams,
   GeminiParams,
   GenerationHistoryItem,
   GptParams,
   ImagePassMode,
   ImageProviderId,
+  MetaParams,
   QwenParams,
   PixAiParams,
+  RunwareParams,
 } from '@/types/gallery'
 import { costumeName, portraitStyle, portraitTitle, poseName, t, term } from '@/i18n'
 
@@ -81,7 +86,7 @@ export const Route = createFileRoute('/studio')({
   component: StudioPage,
 })
 
-const PROVIDER_LIST: ImageProviderId[] = ['gemini', 'gpt', 'qwen', 'doubao', 'pixai', 'comfyui']
+const PROVIDER_LIST: ImageProviderId[] = ['gemini', 'gpt', 'qwen', 'doubao', 'pixai', 'fal', 'runware', 'bria', 'meta', 'custom', 'comfyui']
 
 function StudioPage() {
   const {
@@ -107,6 +112,11 @@ function StudioPage() {
     updateApiConfig,
     updateProviderConfig,
     updatePixAiParams,
+    updateFalParams,
+    updateRunwareParams,
+    updateBriaParams,
+    updateMetaParams,
+    updateCustomParams,
     updateGptParams,
     updateGeminiParams,
     updateQwenParams,
@@ -987,6 +997,72 @@ function StudioPage() {
                 {providerCfg.model !== PIXAI_FLASH_MODEL ? <Field label={t('负向提示词')}><Textarea value={apiConfig.pixaiParams.negativePrompt} onChange={(e) => updatePixAiParams({ negativePrompt: e.target.value })} /></Field> : <p className="text-xs text-muted-foreground">{t('Flash 不使用负向提示词。')}</p>}
                 <Field label={t('Seed（留空为随机）')}><Input type="number" step="1" value={apiConfig.pixaiParams.seed ?? ''} onChange={(e) => updatePixAiParams({ seed: e.target.value === '' ? undefined : Number(e.target.value) })} /></Field>
               </>}
+            </>}
+
+            {activeProvider === 'fal' && <>
+              <Field label={t('输出比例')}>
+                <Select value={apiConfig.falParams.aspectRatio} onValueChange={(value) => updateFalParams({ aspectRatio: value as FalParams['aspectRatio'] })}>
+                  <SelectTrigger className="w-full"><SelectValue /></SelectTrigger>
+                  <SelectContent>{['3:4', '1:1', '4:3', '9:16', '16:9'].map((value) => <SelectItem key={value} value={value}>{value}</SelectItem>)}</SelectContent>
+                </Select>
+              </Field>
+              <Field label={t('图片格式 (output_format)')}>
+                <Select value={apiConfig.falParams.outputFormat} onValueChange={(value) => updateFalParams({ outputFormat: value as FalParams['outputFormat'] })}>
+                  <SelectTrigger className="w-full"><SelectValue /></SelectTrigger>
+                  <SelectContent>{['png', 'jpeg'].map((value) => <SelectItem key={value} value={value}>{value}</SelectItem>)}</SelectContent>
+                </Select>
+              </Field>
+            </>}
+
+            {activeProvider === 'runware' && <>
+              <Field label={t('分辨率')}>
+                <Select value={apiConfig.runwareParams.resolution} onValueChange={(value) => updateRunwareParams({ resolution: value as RunwareParams['resolution'] })}>
+                  <SelectTrigger className="w-full"><SelectValue /></SelectTrigger>
+                  <SelectContent>{['1K', '2K', '4K'].map((value) => <SelectItem key={value} value={value}>{value}</SelectItem>)}</SelectContent>
+                </Select>
+              </Field>
+              <Field label={t('图片格式 (output_format)')}>
+                <Select value={apiConfig.runwareParams.outputFormat} onValueChange={(value) => updateRunwareParams({ outputFormat: value as RunwareParams['outputFormat'] })}>
+                  <SelectTrigger className="w-full"><SelectValue /></SelectTrigger>
+                  <SelectContent>{['PNG', 'JPG', 'WEBP'].map((value) => <SelectItem key={value} value={value}>{value}</SelectItem>)}</SelectContent>
+                </Select>
+              </Field>
+            </>}
+
+            {activeProvider === 'bria' && <>
+              <Field label={t('输出比例')}>
+                <Select value={apiConfig.briaParams.aspectRatio} onValueChange={(value) => updateBriaParams({ aspectRatio: value as BriaParams['aspectRatio'] })}>
+                  <SelectTrigger className="w-full"><SelectValue /></SelectTrigger>
+                  <SelectContent>{['3:4', '1:1', '4:3', '9:16', '16:9'].map((value) => <SelectItem key={value} value={value}>{value}</SelectItem>)}</SelectContent>
+                </Select>
+              </Field>
+            </>}
+
+            {activeProvider === 'meta' && <>
+              <Field label={t('输出尺寸 (size)')}>
+                <Select value={apiConfig.metaParams.size} onValueChange={(value) => updateMetaParams({ size: value as MetaParams['size'] })}>
+                  <SelectTrigger className="w-full"><SelectValue /></SelectTrigger>
+                  <SelectContent>{['1024x1536', '1024x1024', '1536x1024'].map((value) => <SelectItem key={value} value={value}>{value}</SelectItem>)}</SelectContent>
+                </Select>
+              </Field>
+              <Field label={t('图片格式 (output_format)')}>
+                <Select value={apiConfig.metaParams.outputFormat} onValueChange={(value) => updateMetaParams({ outputFormat: value as MetaParams['outputFormat'] })}>
+                  <SelectTrigger className="w-full"><SelectValue /></SelectTrigger>
+                  <SelectContent>{['webp', 'png', 'jpeg'].map((value) => <SelectItem key={value} value={value}>{value}</SelectItem>)}</SelectContent>
+                </Select>
+              </Field>
+            </>}
+
+            {activeProvider === 'custom' && <>
+              <Field label={t('调用端点 (endpointMode)')}>
+                <Select value={apiConfig.customParams.endpointMode} onValueChange={(value) => updateCustomParams({ endpointMode: value as CustomParams['endpointMode'] })}>
+                  <SelectTrigger className="w-full"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="images_edits_json">/v1/images/edits (JSON)</SelectItem>
+                    <SelectItem value="chat">/v1/chat/completions</SelectItem>
+                  </SelectContent>
+                </Select>
+              </Field>
             </>}
 
             <Field label={t('画风预设')}>

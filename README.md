@@ -1,6 +1,6 @@
 # AI Character Reference and Composition Workbench - English Edition (3-in-1)
 
-> **Pose library (1,439 mannequin references + 1,439 depth maps) + Costume library (3,224 sets: Gia realistic 1,407 + Shisei historical Chinese 57 sets / 227 views + Gia anime 1,320 + CharaDB anime 440) + Portrait library (1,499 people) = 6,162 reference records / 12,022 local HD images, plus 1,760 reference images hotlinked from the source sites**, with a built-in **AI image studio supporting 5 protocols** and a **native ComfyUI custom node plugin (`custom_nodes`)**.
+> **Pose library (1,439 mannequin references + 1,439 depth maps) + Costume library (3,224 sets: Gia realistic 1,407 + Shisei historical Chinese 57 sets / 227 views + Gia anime 1,320 + CharaDB anime 440) + Portrait library (1,499 people) = 6,162 reference records / 12,022 local HD images, plus 1,760 reference images hotlinked from the source sites**, with a built-in **AI image studio supporting 11 providers** and a **native ComfyUI custom node plugin (`custom_nodes`)**.
 
 ![Gallery overview](docs/preview.jpg)
 
@@ -38,7 +38,7 @@ The original sites are three AI art reference galleries (poses, costumes, portra
 3. **3-in-1 AI character composition studio (Web Studio)**: a responsive multi-page app built with **React 19 + Tailwind CSS 4 + TypeScript 7 + shadcn/ui + TanStack Router** (PC / tablet / phone):
    - Pick any **portrait + costume + pose (with one-click mannequin / depth switching)** from the three libraries to build a recipe, or randomize a character in one click;
    - Add custom reference images by drag and drop, clipboard paste (`Cmd+V` / `Ctrl+V`) or URL;
-   - Built-in **direct connections to 5 AI image protocols** (Google Gemini, OpenAI GPT Image, Alibaba Cloud Bailian Qwen, ByteDance Volcano Ark Doubao, **local ComfyUI**), with generation history persisted locally in **IndexedDB**.
+   - Built-in **direct connections to 11 AI image providers** (Google Gemini, OpenAI GPT Image, Alibaba Cloud Bailian Qwen, ByteDance Volcano Ark Doubao, PixAI, FAL, Runware AI, Bria AI, Meta Muse Image, a custom OpenAI-compatible API, and **local ComfyUI**), with generation history persisted locally in **IndexedDB**.
 4. **Native ComfyUI custom node plugin (`custom_nodes`)**: this repository is also a plug-and-play ComfyUI plugin. Clone it into `ComfyUI/custom_nodes/` to get **4 custom nodes (pose / costume / portrait / 3-in-1 character recipe)** on the ComfyUI canvas (the pose and recipe nodes have a built-in `use_depth` toggle that can feed ControlNet Depth directly) plus a built-in **visual picker popup covering all 6,162 records**.
 
 ---
@@ -55,11 +55,17 @@ The original sites are three AI art reference galleries (poses, costumes, portra
 - **3+N reference combination**: 3 core slots (portrait / costume / pose, the pose slot has a live [ mannequin | depth ] switch) plus any number of custom reference images (upload, drag and drop, clipboard paste, or image URL).
 - **Reference collage preview and export**: view the 3-in-1 HD reference collage in a popup (`1800x1200` canvas, composed live) and download it as PNG in one click.
 - **12 style presets and structured prompts**: No preset (follow the references), realistic portrait photography, Japanese/Korean magazine editorial, vintage film photography, 2.5D game key art, Japanese anime illustration, Makoto Shinkai-style anime film, Japanese black-and-white manga screentone, 3D next-gen character render, 3D designer toy figure, cyberpunk neon, and character design sheet (pure white background). Prompts are assembled automatically from the selected materials.
-- **5 AI image protocols with advanced parameters**:
+- **11 AI image providers with advanced parameters**:
   - **Google Gemini**: `gemini-3.1-flash-image-preview`, `gemini-3-pro-image-preview`, `gemini-2.5-flash-image` (aspect ratio `aspectRatio`, resolution 1K/2K/4K)
   - **OpenAI GPT Image**: `gpt-image-2.5`, `gpt-image-2`, `gpt-image-1.5`, `gpt-image-1` (`/v1/images/edits` with JSON URL input or multipart upload, size, quality, background transparency)
   - **Alibaba Cloud Bailian Qwen**: `qwen-image-3.0-pro`, `qwen-image-2.1-pro`, `qwen-image-2.0-pro`, `qwen-image-edit-plus` (multi-image reference input via `multimodal-generation`, smart prompt rewriting `prompt_extend`, watermark toggle)
   - **ByteDance Volcano Ark Doubao**: `doubao-seedream-5-0`, `doubao-seedream-4-5-251128`, `doubao-seedream-4-0-250828`, `doubao-seededit-3-0-i2i-250628` (multi-image fusion `image: [...]`, 2K/4K resolution)
+  - **PixAI**: `Tsubaki.3` and `Tsubaki.3 Flash` with resumable background tasks (aspect ratio, resolution, generation mode).
+  - **FAL (fal.ai)**: queue API with automatic polling; edit models such as `fal-ai/nano-banana/edit`, Kontext and Qwen Image Edit receive all reference images, text-to-image models such as FLUX use the prompt only.
+  - **Runware AI**: synchronous `imageInference` calls; reference images are passed via `inputs.referenceImages` (for example with `minimax:h3@image`), and any model can be used by its AIR id.
+  - **Bria AI**: Fibo 2 over the v2 API (`/v2/image/edit` with up to 4 reference images, `/v2/image/generate` without).
+  - **Meta Muse Image**: Meta Model API (`api.meta.ai`, OpenAI-compatible `/v1/images/edits` and `/v1/images/generations`) with `muse-image-1.0`.
+  - **Custom API (OpenAI-compatible)**: any endpoint that speaks the OpenAI image shapes (`/v1/images/edits` JSON or `/v1/chat/completions`) with your own Base URL, key and model id.
   - **Local ComfyUI workflow engine**: uploads the 3-in-1 collage and individual portrait/costume/pose images to a local ComfyUI (`/upload/image`), injects them into custom API workflow placeholders or auto-detects nodes, submits to the `/prompt` queue and polls for results; supports importing and exporting generic `.api.json` workflow templates.
 - **Background generation across pages, with IndexedDB history**: switching pages does not interrupt running generation requests; results are saved to browser IndexedDB (avoiding `localStorage` limits), with prompt reuse and original image download.
 
@@ -145,10 +151,10 @@ If you pick images in the web version (online or local `pnpm dev`) and want gene
 │   ├── components/         # Shared components, AppLayout responsive navigation, GalleryLightbox, RecipeDock
 │   ├── routes/             # Pages: overview (index), poses, costumes, portraits, studio, settings, guide
 │   ├── i18n/               # UI languages (English default in this fork, zh / th available; locales/ holds UI strings)
-│   ├── services/           # Clients for the 5 AI image protocols (aiGenerator.ts) and canvas collage composition (canvasComposer.ts)
+│   ├── services/           # Clients for the AI image providers (aiGenerator.ts) and canvas collage composition (canvasComposer.ts)
 │   ├── store/              # Global recipe, generation state and IndexedDB history (studioStore.tsx)
 │   ├── lib/                # Data loader (dataLoader.ts) and IndexedDB helpers (idbStorage.ts)
-│   └── types/              # Data structures for the three libraries and the 5 AI protocols (gallery.ts)
+│   └── types/              # Data structures for the three libraries and the AI providers (gallery.ts)
 ├── functions/api/proxy.ts  # Cloudflare Pages Functions / Workers same-origin CORS proxy (/api/proxy)
 ├── worker.ts               # Cloudflare Workers entry (static ASSETS + /api/proxy route)
 ├── wrangler.jsonc          # Cloudflare Workers configuration

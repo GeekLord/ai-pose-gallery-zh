@@ -85,7 +85,7 @@ export interface RecipeState {
   extraImages?: ExtraReferenceImage[]
 }
 
-export type ImageProviderId = 'gemini' | 'gpt' | 'qwen' | 'doubao' | 'comfyui' | 'pixai'
+export type ImageProviderId = 'gemini' | 'gpt' | 'qwen' | 'doubao' | 'comfyui' | 'pixai' | 'fal' | 'runware' | 'bria' | 'meta' | 'custom'
 
 export interface ProviderEndpointConfig {
   baseUrl: string
@@ -158,6 +158,29 @@ export interface PixAiParams {
   seed?: number
 }
 
+export interface FalParams {
+  aspectRatio: '3:4' | '1:1' | '4:3' | '9:16' | '16:9'
+  outputFormat: 'png' | 'jpeg'
+}
+
+export interface RunwareParams {
+  resolution: '1K' | '2K' | '4K'
+  outputFormat: 'PNG' | 'JPG' | 'WEBP'
+}
+
+export interface BriaParams {
+  aspectRatio: '3:4' | '1:1' | '4:3' | '9:16' | '16:9'
+}
+
+export interface MetaParams {
+  size: '1024x1536' | '1024x1024' | '1536x1024'
+  outputFormat: 'webp' | 'png' | 'jpeg'
+}
+
+export interface CustomParams {
+  endpointMode: 'images_edits_json' | 'chat'
+}
+
 export interface ApiConfig {
   activeProvider: ImageProviderId
   imagePassMode: ImagePassMode
@@ -170,6 +193,11 @@ export interface ApiConfig {
   qwenParams: QwenParams
   doubaoParams: DoubaoParams
   pixaiParams: PixAiParams
+  falParams: FalParams
+  runwareParams: RunwareParams
+  briaParams: BriaParams
+  metaParams: MetaParams
+  customParams: CustomParams
   comfyuiParams: ComfyUiParams
 }
 
