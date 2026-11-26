@@ -29,15 +29,15 @@ function uiKeys(): Set<string> {
   return keys
 }
 
-test('first visit picks the language from the browser, Chinese otherwise', () => {
+test('first visit picks the language from the browser, English otherwise', () => {
   assert.equal(detectLang(['th-TH', 'en-US']), 'th')
   assert.equal(detectLang(['en-GB']), 'en')
   assert.equal(detectLang(['zh-CN', 'en']), 'zh')
-  assert.equal(detectLang(['ja-JP', 'th']), 'zh')
-  assert.equal(detectLang([]), 'zh')
+  assert.equal(detectLang(['ja-JP', 'th']), 'en')
+  assert.equal(detectLang([]), 'en')
 })
 
-test('Chinese stays the default: t() returns the source text with placeholders filled', () => {
+test('t() falls back to the Chinese source text with placeholders filled', () => {
   assert.equal(t('重置'), '重置')
   assert.equal(t('加载更多（剩余 {n} 套）', { n: 3 }), '加载更多（剩余 3 套）')
 })

@@ -1,4 +1,4 @@
-// 界面多语言（中文为默认语言，英文 / 泰文为可选附加语言）。
+// UI i18n for this fork: English is the default language; Chinese / Thai remain available.
 // - 中文文案直接写在源码中，同时作为翻译字典的 key；未翻译的文案自动回退为中文。
 // - 英文 / 泰文的界面文案在 src/i18n/locales/*.ts，数据标签在 data/i18n/<lang>/*.json（按原有 id 索引）。
 // - 发给图像模型的提示词始终使用原始数据，不受界面语言影响。
@@ -7,7 +7,7 @@ import type { CostumeItem, PortraitItem, PoseGroup, PoseItem } from '@/types/gal
 
 export const LANGS = ['zh', 'en', 'th'] as const
 export type Lang = (typeof LANGS)[number]
-export const DEFAULT_LANG: Lang = 'zh'
+export const DEFAULT_LANG: Lang = 'en'
 export const LANG_STORAGE_KEY = 'ai-pose-gallery-lang'
 export const LANG_LABELS: Record<Lang, string> = { zh: '中文', en: 'English', th: 'ไทย' }
 const HTML_LANG: Record<Lang, string> = { zh: 'zh-CN', en: 'en', th: 'th' }
@@ -36,12 +36,12 @@ export function isLang(value: unknown): value is Lang {
   return typeof value === 'string' && (LANGS as readonly string[]).includes(value)
 }
 
-/** 首次访问按浏览器语言选择：th* → 泰文，en* → 英文，其余（含 zh*）→ 中文。 */
+/** First visit: pick from the browser language - th* -> Thai, zh* -> Chinese, everything else -> English (this fork's default). */
 export function detectLang(languages: readonly string[]): Lang {
   const first = (languages[0] || '').toLowerCase()
   if (first.startsWith('th')) return 'th'
-  if (first.startsWith('en')) return 'en'
-  return 'zh'
+  if (first.startsWith('zh')) return 'zh'
+  return 'en'
 }
 
 function storedLang(): Lang | null {
@@ -82,7 +82,7 @@ function apply(lang: Lang, res: Pick<State, 'ui' | 'data'>) {
 /** 启动时调用：读取已保存的语言，否则按浏览器语言选择；中文无需加载任何资源。 */
 export async function initI18n(): Promise<void> {
   const lang = storedLang() ?? detectLang(typeof navigator === 'undefined' ? [] : navigator.languages || [navigator.language])
-  if (lang !== 'zh') apply(lang, await loadResources(lang))
+  apply(lang, await loadResources(lang))
 }
 
 /** 用户手动切换语言（记住到 localStorage）。 */
