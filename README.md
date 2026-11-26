@@ -1,295 +1,293 @@
-# AI 角色参考与合成工作台 · 中文版（3合1）
+# AI Character Reference and Composition Workbench - English Edition (3-in-1)
 
-> **姿势库（1,439 张素体白模 + 1,439 张深度图 Depth） + 服装库（3,224 套：ギア写实 1,407 + Shisei 中国历代 57 套/227 视角 + ギア动漫 1,320 + CharaDB 二次元 440） + 人像库（1,499 位） = 6,162 条全中文参考数据 / 12,022 张本地高清图，另有 1,760 张来源站点参考图**，集成 **5 大 AI 图像协议直连工作台** 与 **原生 ComfyUI 自定义节点插件（`custom_nodes`）**。
+> **Pose library (1,439 mannequin references + 1,439 depth maps) + Costume library (3,224 sets: Gia realistic 1,407 + Shisei historical Chinese 57 sets / 227 views + Gia anime 1,320 + CharaDB anime 440) + Portrait library (1,499 people) = 6,162 reference records / 12,022 local HD images, plus 1,760 reference images hotlinked from the source sites**, with a built-in **AI image studio supporting 5 protocols** and a **native ComfyUI custom node plugin (`custom_nodes`)**.
 
-![画廊总览预览](docs/preview.jpg)
+![Gallery overview](docs/preview.jpg)
 
-![AI 角色合成台预览](docs/studio.jpg)
+![AI character studio preview](docs/studio.jpg)
 
-<details><summary>手机端预览</summary>
+<details><summary>Mobile preview</summary>
 
-![手机端预览](docs/mobile.jpg)
+![Mobile preview](docs/mobile.jpg)
 
 </details>
 
-**在线演示：** <https://ai-pose-gallery.anhao.app/>
-**原始站点：**
-- 姿势库（白模）：<https://ai-pose-gallery.pages.dev/>
-- 姿势深度图库（Depth）：<https://ai-pose-depth-gallery.pages.dev/>
-- 服装库：<https://ai-costume-gallery.pages.dev/>
-- 人像库：<https://ai-portrait-gallery.pages.dev/>
+**This fork:** English-default edition, maintained by [GeekLord](https://github.com/GeekLord). Forked from the Chinese edition, [anhao/ai-pose-gallery-zh](https://github.com/anhao/ai-pose-gallery-zh), maintained by Anhao ([X @anhao_ai](https://x.com/anhao_ai)). Upstream live demo: <https://ai-pose-gallery.anhao.app/>
 
-**原有图库作者：** ギア（@giaaibusi）；二次元服装作者：たき AI（[@taki_auto](https://x.com/taki_auto) · [CharaDB](https://charadb-2fi.pages.dev/)）。
-**中文版维护：** Anhao · [X @anhao_ai](https://x.com/anhao_ai)
-**GitHub：** <https://github.com/anhao/ai-pose-gallery-zh>
+**Original sites:**
+- Pose library (mannequin): <https://ai-pose-gallery.pages.dev/>
+- Pose depth library (Depth): <https://ai-pose-depth-gallery.pages.dev/>
+- Costume library: <https://ai-costume-gallery.pages.dev/>
+- Portrait library: <https://ai-portrait-gallery.pages.dev/>
 
-> ⚠️ **免责声明（必读）**：
-> 1. **学习与创作限定**：本项目及配套插件/工作流**仅供个人学习、人体动态研究、合法艺术创作与技术交流使用**，严禁用于任何违反法律法规、生成违法违规/淫秽色情内容或侵害他人合法权益（如未经授权的真人肖像换脸）的用途。
-> 2. **NSFW 敏感内容提示**：图库包含部分 18+ 成人向人体素体姿势与内衣/性感穿搭参考，系统默认开启「安全模式 (SFW)」隐藏，**未成年人严禁解锁或访问**。
-> 3. **来源与版权声明**：原有姿势、现实服装、人像参考图源自原作者 **ギア（@giaaibusi）** 公开站点；440 套二次元服装源自 **たき AI（@taki_auto）** 的 [CharaDB](https://charadb-2fi.pages.dev/)（详见其 [LICENSE](https://github.com/taki-ttt/charadb/blob/main/LICENSE)），版权归各自原作者所有；本仓库仅为中文翻译整理与工程学习存档，禁止将图库图片打包倒卖。使用者因违规使用产生的一切法律责任由使用者本人独立承担。
+**Original gallery author:** Gia (@giaaibusi); anime costume author: Taki AI ([@taki_auto](https://x.com/taki_auto) · [CharaDB](https://charadb-2fi.pages.dev/)).
 
----
-
-## 这是什么
-
-原站是ギア（@giaaibusi）发布的三大 AI 绘画参考图库（姿势、服装、人像），元数据全部为日文，且分散在三个独立站点。本仓库（v2.0）完成了**三站合一、全量中文化、AI 角色合成工作台与 ComfyUI 原生插件升级**：
-
-1. **三库四站全量本地镜像（11,568 张图）** —— 完整收录姿势库（素体白模 2,878 张 + 深度图 Depth 2,878 张 WebP）、服装库（2,814 张 WebP）、人像库（2,998 张，全尺寸 `1600×2000` 高清 WebP）的全部缩略图与高清原图，支持纯离线浏览与静态托管。
-2. **原有图库全中文元数据** —— 动作体系、姿势分类、服装款式、穿搭标签、人像分区、发长与 51 种细分发型全部译为地道中文，自动组装的生图提示词纯净无日文干扰。
-3. **三合一 AI 角色合成工作台（Web Studio）** —— 基于 **React 19 + Tailwind CSS 4 + TypeScript 7 + shadcn/ui + TanStack Router** 构建的响应式多页面应用（兼容 PC / 平板 / 手机）：
-   - 从三大图库任意挑选 **人像 + 服装 + 姿势（支持素体白模 / 深度图一键切换）** 组合配方，或一键随机捏人；
-   - 支持拖拽、剪贴板粘贴（`Cmd+V` / `Ctrl+V`）或 URL 添加多张自定义附加参考图；
-   - 内置 **5 大 AI 图像协议直连**（Google Gemini、OpenAI GPT Image、阿里云百炼 Qwen、字节火山方舟 Doubao、**本地 ComfyUI**），生成记录通过 **IndexedDB** 本地持久化保存。
-4. **原生 ComfyUI 自定义节点插件（`custom_nodes`）** —— 本仓库同时是一个即插即用的 ComfyUI 插件！直接 `git clone` 到 `ComfyUI/custom_nodes/` 即可在 ComfyUI 画布内使用 **姿势 / 服装 / 人像 / 三合一角色配方** 4 个自定义节点（姿势与配方节点内置 `use_depth` 深度图切换，可直接接入 ControlNet Depth）与内置的 **6,162 条中文可视化弹窗选图器**。
+> **Disclaimer (read first):**
+> 1. **Learning and creative use only**: This project and its plugins and workflows are **for personal study, human motion research, lawful artistic creation and technical exchange only**. Any use that violates laws or regulations, generates illegal or obscene content, or infringes the lawful rights of others (such as face-swapping real people without authorization) is strictly prohibited.
+> 2. **NSFW content warning**: The galleries include some 18+ adult mannequin poses and lingerie / sexy outfit references. Safe Mode (SFW) is on by default and hides them. **Minors must not unlock or access them.**
+> 3. **Source and copyright**: The original pose, realistic costume and portrait references come from the public sites of the original author **Gia (@giaaibusi)**; the 440 anime costume sets come from **Taki AI (@taki_auto)** and [CharaDB](https://charadb-2fi.pages.dev/) (see its [LICENSE](https://github.com/taki-ttt/charadb/blob/main/LICENSE)). Copyright stays with the respective authors. This repository is a translation and engineering archive for study; reselling the gallery images as a bundle is prohibited. Users bear sole legal responsibility for any unlawful use.
 
 ---
 
-## 核心功能
+## What is this
 
-### 1. 三大参考图库（姿势 / 服装 / 人像）
-- **姿势参考库（`/poses`）**：4 大体系（全身单人・标准系 / 全身单人・性感系 / 上半身单人 / 双人缠绵）、26 个动作分类、288 组姿势、5 种视角（正面 / 斜前 / 侧面 / 背面 / 俯视），支持**按姿势分组 / 逐张浏览**双模式、卡片内多角度切换，以及 **`[ 素体白模 | 深度图 (Depth) ]` 一键切换预览与下载**。
-- **服装参考库（`/costumes`）**：8 大穿搭分类（春季 / 夏季 / 秋季 / 冬季 / 内衣・睡衣 / 性感穿搭 / 泳装・度假 / 派对・礼服）、86 个中文细节标签与英文 Prompt 关键词。
-- **人像参考库（`/portraits`）**：2 大分区（正脸参考 893 / 造型氛围 606）、4 种发长（短发 / 中发 / 中长发 / 长发）、51 种细分发型，支持**精选题集**与**热门榜单**一键筛选。
-- **统一交互体验**：中文关键词实时检索、灯箱高清原图预览与下载、一键「加入合成配方」。
+The original sites are three AI art reference galleries (poses, costumes, portraits) published by Gia (@giaaibusi), with all metadata in Japanese, spread across three separate sites. Version 2.0 of this project **merged the three sites into one, fully localized the metadata, and added an AI character composition studio and a native ComfyUI plugin**:
 
-### 2. AI 角色合成台（`/studio`）
-- **3+N 参考图组合**：3 个核心槽位（人像 / 服装 / 姿势，姿势槽位内置 `[ 白模 | 深度 ]` 实时切换）+ 任意张自定义附加参考图（点击上传、拖拽文件、剪贴板粘贴、填写图片 URL）。
-- **参考拼图预览与导出**：弹窗查看三合一高清参考拼图（`1800×1200` Canvas 实时合成），支持一键下载拼图 PNG。
-- **12 种画风预设 & 纯中文结构化提示词**：内置「无预设（跟随参考图）」、写实人像写真、日韩杂志画报、复古胶片写真、2.5D 游戏原画立绘、日系二次元插画、新海诚感动画电影、日式黑白漫画网点、3D 次世代角色渲染、3D 潮玩手办质感、赛博朋克霓虹、角色设定集立绘（纯白底）共 12 种画风，根据已选素材自动组装提示词。
-- **5 大 AI 图像协议与高级参数**：
-  - **Google Gemini**：`gemini-3.1-flash-image-preview`、`gemini-3-pro-image-preview`、`gemini-2.5-flash-image`（支持宽高比 `aspectRatio`、分辨率 `1K/2K/4K`）
-  - **OpenAI GPT Image**：`gpt-image-2.5`、`gpt-image-2`、`gpt-image-1.5`、`gpt-image-1`（支持 `/v1/images/edits` JSON URL 直传 / Multipart 上传、尺寸、质量、背景透明度）
-  - **阿里云百炼 Qwen**：`qwen-image-3.0-pro`、`qwen-image-2.1-pro`、`qwen-image-2.0-pro`、`qwen-image-edit-plus`（支持 `multimodal-generation` 多图参考输入、智能改写 `prompt_extend`、水印开关）
-  - **字节火山方舟 Doubao**：`doubao-seedream-5-0`、`doubao-seedream-4-5-251128`、`doubao-seedream-4-0-250828`、`doubao-seededit-3-0-i2i-250628`（支持多图融合 `image: [...]`、2K/4K 分辨率）
-  - **本地 ComfyUI 工作流引擎**：支持自动将三合一拼图及单张人像/服装/姿势图上传至本地 ComfyUI（`/upload/image`），注入自定义 API 工作流占位符或自动识别节点提交 `/prompt` 队列并轮询取回成品图；支持导入/导出通用 `.api.json` 工作流模板。
-- **跨页面后台生图 & IndexedDB 历史记录**：切换页面不会中断正在进行的生图请求；生成结果自动存入浏览器 IndexedDB（避免 `localStorage` 容量限制），支持复用提示词与原图下载。
-
-> 本地 ComfyUI 三图合成（Qwen Image Edit 2509）的模型清单、工作流说明和本地运行方法见 [docs/comfyui-local.md](docs/comfyui-local.md)。
-
-> 导入 API 后的动态高级参数、设定集参考上传与可选显示声明见 [ComfyUI 工作流高级参数](docs/comfyui-workflow-parameters.md)。
-
-> WebSocket 实时进度、HTTP 保底与刷新恢复见 [ComfyUI 任务连接与恢复](docs/comfyui-task-tracking.md)。
-
-### 3. ComfyUI 原生自定义节点插件（`comfyui_plugin/`）
-将本仓库克隆到 `ComfyUI/custom_nodes/ai-pose-gallery-zh` 后，ComfyUI 画布右键菜单 **「AI角色三合一参考图集」** 下自动提供 4 个节点：
-- **AI 姿势参考图 (`PoseGalleryNode`)**：输出 `姿势图 (IMAGE)`、`图片ID`、`姿势提示词`（支持 `use_depth` 开关一键切换输出素体白模或深度图）
-- **AI 服装参考图 (`CostumeGalleryNode`)**：输出 `服装图 (IMAGE)`、`图片ID`、`中文服装描述`、`英文服装Prompt`
-- **AI 人像参考图 (`PortraitGalleryNode`)**：输出 `人像图 (IMAGE)`、`图片ID`、`人像发型描述`
-- **AI 角色三合一合成配方 (`CharacterRecipeNode`)**：单节点同时输出 `人像图`、`服装图`、`姿势图（支持 use_depth 深度图切换）`、`三合一拼图` 以及自动组装的 `中文合成Prompt` 与 `英文合成Prompt`，并内置 **6,162 条中文可视化弹窗选图器（含 🌗 深度图预览开关）**与节点内实时缩略图预览。
-
-
-### 4. 界面语言：中文（默认）/ English / ไทย
-- 页面右上角的国旗按钮可切换 **中文 / English / ไทย**，选择会保存在浏览器 `localStorage`；首次访问按浏览器语言自动选择（`th*` → 泰文，`en*` → 英文，其余一律中文）。
-- 中文为默认语言且数据不变：英文 / 泰文只是附加的显示层，界面文案在 `src/i18n/locales/`，数据标签（姿势名称、服装名称、分类、标签、发型等）在 `data/i18n/<lang>/`，按原有 id 索引；未翻译的内容自动回退为中文。
-- 发送给图像模型的提示词始终使用原始数据，与界面语言无关；安全模式（SFW）规则不变。
+1. **Full local mirror of all three libraries (11,568 images)**: every thumbnail and HD original from the pose library (2,878 mannequin images + 2,878 depth WebP), the costume library (2,814 WebP) and the portrait library (2,998 full-size `1600x2000` HD WebP), for fully offline browsing and static hosting.
+2. **Fully localized metadata**: pose systems, pose categories, costume styles, outfit tags, portrait sections, hair lengths and 51 hairstyles, all translated; auto-assembled image prompts carry no Japanese interference.
+3. **3-in-1 AI character composition studio (Web Studio)**: a responsive multi-page app built with **React 19 + Tailwind CSS 4 + TypeScript 7 + shadcn/ui + TanStack Router** (PC / tablet / phone):
+   - Pick any **portrait + costume + pose (with one-click mannequin / depth switching)** from the three libraries to build a recipe, or randomize a character in one click;
+   - Add custom reference images by drag and drop, clipboard paste (`Cmd+V` / `Ctrl+V`) or URL;
+   - Built-in **direct connections to 5 AI image protocols** (Google Gemini, OpenAI GPT Image, Alibaba Cloud Bailian Qwen, ByteDance Volcano Ark Doubao, **local ComfyUI**), with generation history persisted locally in **IndexedDB**.
+4. **Native ComfyUI custom node plugin (`custom_nodes`)**: this repository is also a plug-and-play ComfyUI plugin. Clone it into `ComfyUI/custom_nodes/` to get **4 custom nodes (pose / costume / portrait / 3-in-1 character recipe)** on the ComfyUI canvas (the pose and recipe nodes have a built-in `use_depth` toggle that can feed ControlNet Depth directly) plus a built-in **visual picker popup covering all 6,162 records**.
 
 ---
 
-## 数据规模
+## Core features
 
-| 图库 | 分类 / 体系划分 | 记录数 | 本地图片文件数 |
+### 1. Three reference galleries (poses / costumes / portraits)
+- **Pose library (`/poses`)**: 4 systems (full-body solo, standard / full-body solo, sexy / upper-body solo / two-person), 26 action categories, 288 pose groups, 5 views (front / three-quarter / side / back / top-down), **grouped / per-image browsing**, multi-angle switching inside cards, and **one-click [ mannequin | depth (Depth) ] preview and download switching**.
+- **Costume library (`/costumes`)**: 8 outfit categories (spring / summer / autumn / winter / lingerie and sleepwear / sexy / swimwear and vacation / party and formal), 86 detail tags and English prompt keywords.
+- **Portrait library (`/portraits`)**: 2 sections (face reference 893 / styling and mood 606), 4 hair lengths (short / medium / medium-long / long), 51 hairstyles, with **curated collections** and **top charts** one-click filters.
+- **Unified experience**: live keyword search, lightbox HD preview and download, one-click "add to recipe".
+
+### 2. AI character composition studio (`/studio`)
+- **3+N reference combination**: 3 core slots (portrait / costume / pose, the pose slot has a live [ mannequin | depth ] switch) plus any number of custom reference images (upload, drag and drop, clipboard paste, or image URL).
+- **Reference collage preview and export**: view the 3-in-1 HD reference collage in a popup (`1800x1200` canvas, composed live) and download it as PNG in one click.
+- **12 style presets and structured prompts**: No preset (follow the references), realistic portrait photography, Japanese/Korean magazine editorial, vintage film photography, 2.5D game key art, Japanese anime illustration, Makoto Shinkai-style anime film, Japanese black-and-white manga screentone, 3D next-gen character render, 3D designer toy figure, cyberpunk neon, and character design sheet (pure white background). Prompts are assembled automatically from the selected materials.
+- **5 AI image protocols with advanced parameters**:
+  - **Google Gemini**: `gemini-3.1-flash-image-preview`, `gemini-3-pro-image-preview`, `gemini-2.5-flash-image` (aspect ratio `aspectRatio`, resolution 1K/2K/4K)
+  - **OpenAI GPT Image**: `gpt-image-2.5`, `gpt-image-2`, `gpt-image-1.5`, `gpt-image-1` (`/v1/images/edits` with JSON URL input or multipart upload, size, quality, background transparency)
+  - **Alibaba Cloud Bailian Qwen**: `qwen-image-3.0-pro`, `qwen-image-2.1-pro`, `qwen-image-2.0-pro`, `qwen-image-edit-plus` (multi-image reference input via `multimodal-generation`, smart prompt rewriting `prompt_extend`, watermark toggle)
+  - **ByteDance Volcano Ark Doubao**: `doubao-seedream-5-0`, `doubao-seedream-4-5-251128`, `doubao-seedream-4-0-250828`, `doubao-seededit-3-0-i2i-250628` (multi-image fusion `image: [...]`, 2K/4K resolution)
+  - **Local ComfyUI workflow engine**: uploads the 3-in-1 collage and individual portrait/costume/pose images to a local ComfyUI (`/upload/image`), injects them into custom API workflow placeholders or auto-detects nodes, submits to the `/prompt` queue and polls for results; supports importing and exporting generic `.api.json` workflow templates.
+- **Background generation across pages, with IndexedDB history**: switching pages does not interrupt running generation requests; results are saved to browser IndexedDB (avoiding `localStorage` limits), with prompt reuse and original image download.
+
+> Model list, workflow notes and local setup for the local ComfyUI three-image composition (Qwen Image Edit 2509): [docs/comfyui-local.md](docs/comfyui-local.md).
+
+> Dynamic advanced parameters after API import, design-sheet reference uploads and optional display declarations: [ComfyUI workflow advanced parameters](docs/comfyui-workflow-parameters.md).
+
+> WebSocket live progress, HTTP fallback and refresh recovery: [ComfyUI task connection and recovery](docs/comfyui-task-tracking.md).
+
+### 3. ComfyUI native custom node plugin (`comfyui_plugin/`)
+Clone this repository into `ComfyUI/custom_nodes/ai-pose-gallery-zh` and the ComfyUI canvas right-click menu gains 4 nodes under **"AI Character 3-in-1 Reference Gallery"**:
+- **AI Pose Reference (`PoseGalleryNode`)**: outputs `pose image (IMAGE)`, `image ID`, `pose prompt` (with a `use_depth` toggle to output the mannequin or the depth map)
+- **AI Costume Reference (`CostumeGalleryNode`)**: outputs `costume image (IMAGE)`, `image ID`, `Chinese costume description`, `English costume prompt`
+- **AI Portrait Reference (`PortraitGalleryNode`)**: outputs `portrait image (IMAGE)`, `image ID`, `portrait hairstyle description`
+- **AI Character 3-in-1 Recipe (`CharacterRecipeNode`)**: one node outputs `portrait image`, `costume image`, `pose image (with use_depth depth switching)`, the `3-in-1 collage`, plus auto-assembled `Chinese composition prompt` and `English composition prompt`, with a built-in **visual picker popup for all 6,162 records (including a depth preview toggle)** and live thumbnail previews inside the node.
+
+### 4. Interface language: English (default in this fork) / Chinese / Thai
+- The flag button at the top right switches **English / Chinese / Thai**; the choice is saved in browser `localStorage`. On a first visit the language follows the browser: `th*` gets Thai, `zh*` gets Chinese, and everything else gets English.
+- The underlying data is unchanged by the display language: English and Thai are display layers only. UI strings live in `src/i18n/locales/`; data labels (pose names, costume names, categories, tags, hairstyles) live in `data/i18n/<lang>/`, indexed by the original ids. Anything untranslated falls back to Chinese.
+- Prompts sent to image models always use the original data, regardless of interface language; Safe Mode (SFW) rules are unchanged.
+
+---
+
+## Data scale
+
+| Library | Categories / systems | Records | Local image files |
 | --- | --- | ---: | ---: |
-| **姿势库（Pose 白模）** | 全身标准 (365) · 全身性感 (399) · 上半身 (400) · 双人缠绵 (275) | 1,439 | 2,878 张（缩略图 `.jpg` + 原图 `.png`） |
-| **姿势深度图（Pose Depth）** | 与 1,439 条姿势 ID 一一对应（`POSE-DB-02`） | 1,439（共享索引） | 2,878 张（缩略图 `.webp` + 原图 `.webp`） |
-| **服装库（ギア写实）** | 春季 (215) · 夏季 (254) · 秋季 (244) · 冬季 (253) · 内衣睡衣 (199) · 性感 (140) · 泳装 (54) · 礼服 (48) | 1,407 | 2,814 张（缩略图 `.webp` + 原图 `.webp`） |
-| **中国历代服装（Shisei）** | 商至清代历代服装（正面 / 斜侧 / 侧面 / 背面多视角） | 57（227 视角） | 454 张（缩略图 `.webp` + 原图 `.png`） |
-| **动漫服装（ギア动漫）** | 春季 · 夏季 · 秋季 · 冬季 · 内衣睡衣 · 性感 · 泳装 · 礼服 | 1,320 | 原站热链，仓库与发布包不存图 |
-| **二次元服装（CharaDB）** | 15类，中文名称与原始Danbooru标签 | 440 | 原站热链，仓库与发布包不存图 |
-| **人像库（Portrait）** | 正脸参考 (893) · 造型氛围 (606) / 短发 (727) · 中发 (376) · 中长发 (260) · 长发 (136) | 1,499 | 2,998 张（缩略图 `.webp` + `1600×2000` 原图 `.webp`） |
-| **合计** | **3 大图库全中文索引（含白模 + 深度双视图）** | **6,162** | **12,022 张** |
+| **Pose library (mannequin)** | Full-body standard (365) · Full-body sexy (399) · Upper body (400) · Two-person (275) | 1,439 | 2,878 (thumbnails `.jpg` + originals `.png`) |
+| **Pose depth maps** | One-to-one with the 1,439 pose ids (`POSE-DB-02`) | 1,439 (shared index) | 2,878 (thumbnails `.webp` + originals `.webp`) |
+| **Costume library (Gia realistic)** | Spring (215) · Summer (254) · Autumn (244) · Winter (253) · Lingerie and sleepwear (199) · Sexy (140) · Swimwear (54) · Formal (48) | 1,407 | 2,814 (thumbnails `.webp` + originals `.webp`) |
+| **Historical Chinese costumes (Shisei)** | Dynasties from Shang to Qing (front / three-quarter / side / back views) | 57 (227 views) | 454 (thumbnails `.webp` + originals `.png`) |
+| **Anime costumes (Gia anime)** | Spring · Summer · Autumn · Winter · Lingerie and sleepwear · Sexy · Swimwear · Formal | 1,320 | Hotlinked from the source site; not stored in this repo or its release packages |
+| **Anime costumes (CharaDB)** | 15 categories, Chinese names with original Danbooru tags | 440 | Hotlinked from the source site; not stored in this repo or its release packages |
+| **Portrait library** | Face reference (893) · Styling and mood (606) / Short hair (727) · Medium (376) · Medium-long (260) · Long (136) | 1,499 | 2,998 (thumbnails `.webp` + `1600x2000` originals `.webp`) |
+| **Total** | **All three galleries (with mannequin + depth dual views)** | **6,162** | **12,022** |
 
 ---
 
-## 在 ComfyUI 中使用（双模式支持）
+## Using it in ComfyUI (two modes)
 
-### 模式 A：作为 ComfyUI 原生插件安装（在 ComfyUI 画布内选图）
+### Mode A: install as a native ComfyUI plugin (pick images inside the ComfyUI canvas)
 
-无需安装额外 Python 依赖（直接复用 ComfyUI 自带的 `torch`、`numpy`、`Pillow`、`aiohttp`）：
+No extra Python dependencies are needed (it reuses ComfyUI's own `torch`, `numpy`, `Pillow`, `aiohttp`):
 
 ```bash
 cd /path/to/ComfyUI/custom_nodes
-git clone --depth 1 https://github.com/anhao/ai-pose-gallery-zh.git
+git clone --depth 1 https://github.com/GeekLord/ai-pose-gallery-zh.git
 ```
 
-重启 ComfyUI 后：
-1. 在画布空白处右键 → **新建节点** → **AI角色三合一参考图集**；
-2. 选择 **「AI 角色三合一合成配方 (3-in-1 Recipe)」** 或单个姿势 / 服装 / 人像节点；
-3. 点击节点上的 **「🎨 打开三合一选图器 (6,162张)」** 按钮（或直接点击节点上的缩略图），即可在弹窗中按分类、视角、发长筛选或中文搜索，一键填入节点并输出 `IMAGE` 张量与中英文 Prompt。
+After restarting ComfyUI:
+1. Right-click on empty canvas space, then **Add Node** and the **AI Character 3-in-1 Reference Gallery** category;
+2. Choose the **AI Character 3-in-1 Recipe** node, or a single pose / costume / portrait node;
+3. Click the **"Open 3-in-1 picker (6,162 images)"** button on the node (or click the thumbnail on the node) to filter by category, view and hair length, or search, then insert the pick into the node in one click. The node outputs an `IMAGE` tensor plus Chinese and English prompts.
 
-### 模式 B：从 Web 合成台直连本地 ComfyUI API
+### Mode B: drive a local ComfyUI API from the web studio
 
-如果您使用线上网页端（或本地 `pnpm dev`）选图，希望直接调用本机 ComfyUI 生图：
-1. 启动本地 ComfyUI 时开启跨域参数：
+If you pick images in the web version (online or local `pnpm dev`) and want generation to run on your own ComfyUI:
+1. Start local ComfyUI with CORS enabled:
    ```bash
    python main.py --enable-cors-header "*"
    ```
-2. 打开本工作台 **「接口配置」** 页面 → 切换到 **「本地 ComfyUI」** → 点击「检测连接」（默认 `http://127.0.0.1:8188`）；
-3. 可直接导入您在 ComfyUI 中通过 `工作流 -> 导出 (API)` 保存的 `.json` 文件（支持 `{{prompt}}`、`{{seed}}`、`{{width}}`、`{{height}}`、`{{composite_image}}`、`{{portrait_image}}`、`{{costume_image}}`、`{{pose_image}}` 占位符，或由系统自动匹配 `CLIPTextEncode` / `KSampler` / `LoadImage` 节点），也可在 **「合成台」** 一键导出内置通用工作流模板。
+2. Open the **API Settings** page in this workbench, switch to **Local ComfyUI**, and click "Test connection" (default `http://127.0.0.1:8188`);
+3. Import a `.json` file exported from ComfyUI via `Workflow -> Export (API)` (supports the `{{prompt}}`, `{{seed}}`, `{{width}}`, `{{height}}`, `{{composite_image}}`, `{{portrait_image}}`, `{{costume_image}}` and `{{pose_image}}` placeholders, or auto-matching of `CLIPTextEncode` / `KSampler` / `LoadImage` nodes), or export the built-in generic workflow template from the **Studio** in one click.
 
 ---
 
-## 技术栈与目录结构
+## Tech stack and repository layout
 
-- **前端框架**：React 19.3 + TypeScript 7.0 + Vite 8 (Rolldown)
-- **路由与状态**：TanStack Router + TanStack Query + IndexedDB 本地存储
-- **样式与组件**：Tailwind CSS 4.3 + shadcn/ui (Radix UI) + Lucide Icons
-- **ComfyUI 插件**：Python (`aiohttp` + `Pillow` + `torch`) + LiteGraph Frontend Extension
-- **代码质量**：Oxlint + Oxfmt
+- **Frontend**: React 19.3 + TypeScript 7.0 + Vite 8 (Rolldown)
+- **Routing and state**: TanStack Router + TanStack Query + IndexedDB local storage
+- **Styling and components**: Tailwind CSS 4.3 + shadcn/ui (Radix UI) + Lucide Icons
+- **ComfyUI plugin**: Python (`aiohttp` + `Pillow` + `torch`) + LiteGraph frontend extension
+- **Code quality**: Oxlint + Oxfmt
 
 ```text
 .
-├── __init__.py             # ComfyUI 自定义节点插件根入口 (NODE_CLASS_MAPPINGS / WEB_DIRECTORY)
-├── comfyui_plugin/         # ComfyUI 原生插件模块
-│   ├── nodes.py            # 姿势 / 服装 / 人像 / 三合一角色配方 4 个 ComfyUI 节点实现
-│   ├── routes.py           # ComfyUI PromptServer 本地目录与图片静态服务路由
-│   └── web/                # ComfyUI 画布节点缩略图预览与 4,785 张可视化弹窗选图器 (extension.js / style.css)
+├── __init__.py             # ComfyUI custom node plugin entry point (NODE_CLASS_MAPPINGS / WEB_DIRECTORY)
+├── comfyui_plugin/         # Native ComfyUI plugin module
+│   ├── nodes.py            # The 4 ComfyUI nodes: pose / costume / portrait / 3-in-1 recipe
+│   ├── routes.py           # PromptServer local directory and image static routes
+│   └── web/                # Node thumbnail previews and the visual picker popup (extension.js / style.css)
 ├── src/
-│   ├── components/         # 通用组件、AppLayout 响应式导航、GalleryLightbox 灯箱、RecipeDock
-│   ├── routes/             # 页面路由：概览(index)、姿势(poses)、服装(costumes)、人像(portraits)、合成台(studio)、配置(settings)、指南(guide)
-│   ├── i18n/               # 界面多语言（中文默认，附加 en / th；locales/ 为界面文案）
-│   ├── services/           # 5 大 AI 图像协议客户端 (aiGenerator.ts) 与 Canvas 拼图合成 (canvasComposer.ts)
-│   ├── store/              # 全局配方、生图状态与 IndexedDB 历史管理 (studioStore.tsx)
-│   ├── lib/                # 数据加载器 (dataLoader.ts) 与 IndexedDB 工具 (idbStorage.ts)
-│   └── types/              # 三库数据结构与 5 大 AI 协议类型定义 (gallery.ts)
-├── functions/api/proxy.ts  # Cloudflare Pages Functions / Workers 同源 CORS 代理 (/api/proxy)
-├── worker.ts               # Cloudflare Workers 入口（静态资源 ASSETS + /api/proxy 路由）
-├── wrangler.jsonc          # Cloudflare Workers 配置文件
+│   ├── components/         # Shared components, AppLayout responsive navigation, GalleryLightbox, RecipeDock
+│   ├── routes/             # Pages: overview (index), poses, costumes, portraits, studio, settings, guide
+│   ├── i18n/               # UI languages (English default in this fork, zh / th available; locales/ holds UI strings)
+│   ├── services/           # Clients for the 5 AI image protocols (aiGenerator.ts) and canvas collage composition (canvasComposer.ts)
+│   ├── store/              # Global recipe, generation state and IndexedDB history (studioStore.tsx)
+│   ├── lib/                # Data loader (dataLoader.ts) and IndexedDB helpers (idbStorage.ts)
+│   └── types/              # Data structures for the three libraries and the 5 AI protocols (gallery.ts)
+├── functions/api/proxy.ts  # Cloudflare Pages Functions / Workers same-origin CORS proxy (/api/proxy)
+├── worker.ts               # Cloudflare Workers entry (static ASSETS + /api/proxy route)
+├── wrangler.jsonc          # Cloudflare Workers configuration
 ├── data/
-│   ├── pose.json / pose-zh.json                 # 姿势库原始数据 & 中文数据（1,439 条）
-│   ├── costume.json / costume-zh.json           # 服装库原始数据 & 中文数据（1,407 条）
-│   ├── portrait.json / portrait-zh.json         # 人像库原始数据 & 中文数据（1,499 条）
-│   ├── meta-zh.json / *-meta-zh.json            # 三库中文体系分类元数据与热门榜单
-│   ├── i18n/en/ · i18n/th/                      # 英文 / 泰文数据标签（按原有 id 索引，仅用于界面显示）
-│   └── translations.csv                         # 日⇄中翻译对照表
-├── thumbs/                 # 缩略图目录（姿势根目录 + depth/ + costume/ + portrait/）
-├── img/                    # 高清原图目录（姿势根目录 + depth/ + costume/ + portrait/）
+│   ├── pose.json / pose-zh.json                 # Pose library original data and Chinese data (1,439 records)
+│   ├── costume.json / costume-zh.json           # Costume library original data and Chinese data (1,407 records)
+│   ├── portrait.json / portrait-zh.json         # Portrait library original data and Chinese data (1,499 records)
+│   ├── meta-zh.json / *-meta-zh.json            # Chinese system/category metadata and top charts for the three libraries
+│   ├── i18n/en/ · i18n/th/                      # English / Thai data labels (indexed by original id, display only)
+│   └── translations.csv                         # Japanese-Chinese translation table
+├── thumbs/                 # Thumbnails (poses at root + depth/ + costume/ + portrait/)
+├── img/                    # HD originals (poses at root + depth/ + costume/ + portrait/)
 ├── scripts/
-│   ├── download.py         # 四站并发下载器（支持 DATASET=all|pose|depth|costume|portrait）
-│   ├── i18n.py             # 日译中词典与人像发型/服装标签映射
-│   ├── apply_translation.py# 生成三库 *-zh.json 纯中文数据与检索索引
-│   ├── verify.py           # 校验本地图片完整性（存在性 / 大小 / 文件头）
-│   └── build.sh            # 构建 Cloudflare 发布目录 dist/
-├── skills/                 # Claude Code / Agent 姿势・服装・人像检索技能包
+│   ├── download.py         # Four-site concurrent downloader (DATASET=all|pose|depth|costume|portrait)
+│   ├── i18n.py             # Japanese-to-Chinese dictionary and portrait hairstyle / costume tag mappings
+│   ├── apply_translation.py# Regenerates the three libraries' *-zh.json Chinese data and search indexes
+│   ├── verify.py           # Verifies local image completeness (existence / size / file headers)
+│   └── build.sh            # Builds the Cloudflare release directory dist/
+├── skills/                 # Agent skill packs for pose / costume / portrait search
 └── README.md
 ```
 
 ---
 
-## 本地开发与构建
+## Local development and build
 
-需要 **Node.js 20+** 与 **pnpm**：
+Requires **Node.js 20+** and **pnpm**:
 
 ```bash
-# 1. 安装依赖
+# 1. Install dependencies
 pnpm install
 
-# 2. 启动本地开发服务器（默认 http://localhost:5173）
+# 2. Start the local dev server (default http://localhost:5173)
 pnpm dev
 
-# 3. 类型检查 + 生产构建 + 代码规范检查
+# 3. Type check + production build + lint
 pnpm build && pnpm lint
 ```
 
-### 数据与图片维护脚本（Python 3）
+### Data and image maintenance scripts (Python 3)
 
 ```bash
-# 拉取/补全三站图片（已存在的文件自动跳过，支持断点续传）
+# Fetch / complete the images from the source sites (existing files are skipped, resumable)
 python3 scripts/download.py
-WORKERS=64 python3 scripts/download.py   # 调整并发线程数
+WORKERS=64 python3 scripts/download.py   # adjust concurrency
 
-# 修改 scripts/i18n.py 词典后，重新生成三库中文 JSON
+# After editing the dictionary in scripts/i18n.py, regenerate the Chinese JSON for the three libraries
 python3 scripts/apply_translation.py
 
-# 校验全部图片文件是否完整
+# Verify all image files are complete
 python3 scripts/verify.py
 ```
 
 ---
 
-## 部署到 Cloudflare（Workers / Pages）
+## Deploying to Cloudflare (Workers / Pages)
 
-本项目自带 [wrangler.jsonc](wrangler.jsonc) 与 [worker.ts](worker.ts)，同时支持 **Cloudflare Workers（含静态 Assets + `/api/proxy` 同源代理）** 与 **Cloudflare Pages** 部署。仓库总体积约 `1.1 GB`、总文件数约 `11,600` 个、单文件全部 `< 2 MB`，完全符合 Cloudflare 免费版限制（单文件 ≤ 25 MiB，文件数 ≤ 20,000）。
+This project ships with [wrangler.jsonc](wrangler.jsonc) and [worker.ts](worker.ts) and supports both **Cloudflare Workers (static Assets + the `/api/proxy` same-origin proxy)** and **Cloudflare Pages**. The repository is about `1.1 GB` with about `11,600` files, every file under `2 MB`, well within Cloudflare free-tier limits (single file at most 25 MiB, at most 20,000 files).
 
-> 💡 **自定义代理域名白名单（可选）**：`/api/proxy` 默认放行五大官方 AI 接口域名，并在切换至阿里云百炼（Qwen）或火山方舟（Doubao）时自动开启。若需通过服务端代理转发自定义中转站，可在 Cloudflare 环境变量或 `wrangler.jsonc` 的 `vars.PROXY_ALLOWED_ORIGINS` 中配置逗号分隔的来源白名单（支持精确域名与泛子域名，如 `https://api.example.com,https://*.openai.com`）。
+> **Custom proxy origin allowlist (optional)**: `/api/proxy` allows the five official AI API domains by default, and turns on automatically for Alibaba Cloud Bailian (Qwen) or Volcano Ark (Doubao). To proxy a custom relay through the server side, set a comma-separated origin allowlist in the Cloudflare environment variable or `vars.PROXY_ALLOWED_ORIGINS` in `wrangler.jsonc` (exact domains and wildcard subdomains are supported, e.g. `https://api.example.com,https://*.openai.com`).
 
-### 方式一：Cloudflare Workers 自动/命令行部署（推荐，内置 `/api/proxy` 解决千问/豆包跨域）
+### Option 1: Cloudflare Workers, automatic or command-line deploy (recommended; the built-in /api/proxy solves Qwen/Doubao CORS)
 
 ```bash
-# 1. 构建前端与静态资源目录 dist/
+# 1. Build the frontend and the static asset directory dist/
 bash scripts/build.sh
 
-# 2. 本地或预览环境验证
+# 2. Verify locally or in a preview environment
 npx wrangler versions upload
 
-# 3. 正式部署到 Cloudflare Workers
+# 3. Deploy to Cloudflare Workers
 npx wrangler deploy
 ```
 
-若使用 Cloudflare Dashboard 连接 GitHub 自动构建 Workers：
-- **Build command**：`bash scripts/build.sh`
-- **Deploy command**：`npx wrangler deploy`
+If you connect GitHub in the Cloudflare Dashboard for automatic Workers builds:
+- **Build command**: `bash scripts/build.sh`
+- **Deploy command**: `npx wrangler deploy`
 
-### 方式二：Cloudflare Pages 部署
+### Option 2: Cloudflare Pages deploy
 
-1. 登录 Cloudflare Dashboard → **Workers & Pages** → **Create** → **Pages** → **Connect to Git**
-2. 选择本仓库 → 生产分支 `main`
-3. 构建设置：
+1. Sign in to the Cloudflare Dashboard, then **Workers & Pages** -> **Create** -> **Pages** -> **Connect to Git**
+2. Select this repository, production branch `main`
+3. Build settings:
 
-   | 字段 | 值 |
+   | Field | Value |
    | --- | --- |
-   | Framework preset | `None`（或 `Vite`） |
+   | Framework preset | `None` (or `Vite`) |
    | Build command | `bash scripts/build.sh` |
    | Build output directory | `dist` |
 
 ---
 
-## Agent 技能（Skills）
+## Agent skills
 
-`skills/` 下提供 9 个 `SKILL.md` 格式的 Agent 技能，让 AI Agent 检索姿势、服装、人像参考。原有技能的 `references/catalog.csv` 用**相对路径**（`../../img/…`）指向本仓库 `img/`；二次元技能使用原站URL，不重复存图：
+`skills/` contains 9 agent skills in `SKILL.md` format, so AI agents can search the pose, costume and portrait references. The original skills' `references/catalog.csv` files use **relative paths** (`../../img/...`) into this repository's `img/`; the anime skill uses source-site URLs and stores no images:
 
-| 技能 | 图片数 | 范围 |
+| Skill | Images | Scope |
 | --- | ---: | --- |
-| `pose-reference-standard` | 365 | 全身单人・标准系 |
-| `pose-reference-upper` | 400 | 上半身单人 |
-| `pose-reference-sexy` | 399 | 全身单人・性感系（18+） |
-| `pose-reference-couple` | 275 | 双人缠绵（18+） |
-| `pose-reference-all` | 1,439 | 全部姿势 |
-| `costume-reference` | 1,068 | 服装：春夏秋冬・派对礼服・泳装度假（按单品 / 颜色 / 英文关键词检索） |
-| `costume-reference-anime` | 440 | CharaDB 二次元服装，联网参考图，独立来源限制 |
-| `costume-reference-sexy` | 339 | 服装：内衣睡衣・性感穿搭（18+） |
-| `portrait-reference` | 1,499 | 人像：正脸参考・造型氛围，按发长 / 51 种发型检索 |
+| `pose-reference-standard` | 365 | Full-body solo, standard |
+| `pose-reference-upper` | 400 | Upper-body solo |
+| `pose-reference-sexy` | 399 | Full-body solo, sexy (18+) |
+| `pose-reference-couple` | 275 | Two-person (18+) |
+| `pose-reference-all` | 1,439 | All poses |
+| `costume-reference` | 1,068 | Costumes: seasons, party and formal, swimwear and vacation (search by item / color / English keyword) |
+| `costume-reference-anime` | 440 | CharaDB anime costumes, online reference images, separate source terms |
+| `costume-reference-sexy` | 339 | Costumes: lingerie and sleepwear, sexy outfits (18+) |
+| `portrait-reference` | 1,499 | Portraits: face reference, styling and mood, by hair length / 51 hairstyles |
 
 ```bash
-git clone --depth 1 https://github.com/anhao/ai-pose-gallery-zh.git ~/ai-pose-gallery-zh
+git clone --depth 1 https://github.com/GeekLord/ai-pose-gallery-zh.git ~/ai-pose-gallery-zh
 mkdir -p ~/.claude/skills
 for d in ~/ai-pose-gallery-zh/skills/*-reference*; do ln -s "$d" ~/.claude/skills/; done
 ```
 
-原有技能靠相对路径读取 `img/`，请**软链**而不是复制，并保留整个仓库。`costume-reference-anime` 使用原站URL，不保存图片，且适用独立来源限制。组合参考时须分别遵守各来源条件。
+The original skills read `img/` through relative paths, so **symlink** them instead of copying, and keep the whole repository. `costume-reference-anime` uses source-site URLs, stores no images, and is governed by its own source terms. When combining references, follow each source's terms separately.
 
 ---
 
-## 二次元服装（CharaDB）
+## Anime costumes (CharaDB)
 
-新增 **たき AI（[@taki_auto](https://x.com/taki_auto)）** [CharaDB](https://charadb-2fi.pages.dev/) 公开版 **440 套**二次元服装：服装页与 ComfyUI 选图器均支持按 **`[ 全部 | 现实 | 二次元 ]`** 一级分类、15 个二级分类及单品颜色标签筛选，支持中文名称、英文 Danbooru 标签和编号检索。
+Includes the public **440 sets** of anime costumes from **Taki AI ([@taki_auto](https://x.com/taki_auto))** and [CharaDB](https://charadb-2fi.pages.dev/): the costume page and the ComfyUI picker both support filtering by the top-level **[ All | Realistic | Anime ]** category, 15 subcategories and item color tags, with search by Chinese name, English Danbooru tag and id.
 
-- **在线原图加载**：根据[原作者 LICENSE](https://github.com/taki-ttt/charadb/blob/main/LICENSE)（标签为 CC0，图片仅作参考且禁止再分发、禁止用于真人或未成年人用途），本仓库仅收录中文翻译与标签元数据（`data/costume-anime-zh.json`），图片直接从原站在线加载，不随本仓库打包分发。
-- **数据更新脚本**：
+- **Online original image loading**: under the [original author's LICENSE](https://github.com/taki-ttt/charadb/blob/main/LICENSE) (tags are CC0; images are reference-only, redistribution is prohibited, and use with real people or minors is prohibited), this repository includes only the Chinese translations and tag metadata (`data/costume-anime-zh.json`); images load online from the source site and are not distributed with this repository.
+- **Data update script**:
   ```bash
   python3 scripts/import_charadb.py
   ```
 
-## 免责声明与版权说明（Disclaimer）
+## Disclaimer and copyright
 
-1. **合法合规与学习用途声明（严禁违法）**
-   - 本项目（含前端工作台、ComfyUI 插件、工作流模板及 Agent 技能）**仅供个人学习、人体结构研究、绘画动作参考与技术交流使用**。
-   - **严禁将本项目用于任何违法违规用途**，包括但不限于生成制作传播淫秽色情物品、暴力恐怖内容、虚假违法信息，或未经他人明确授权使用真实人物照片进行换脸/深伪合成（Deepfake）等侵犯他人肖像权、隐私权与名誉权的行为。
-   - 本工作台为纯前端/本地工具，所有 AI 生图请求均由使用者自行配置的云端 API 或使用者本机 ComfyUI 环境执行，平台不收集、不存储任何用户上传的图片或生成结果。**使用者对其上传素材及生成内容承担全部法律责任，本仓库作者及贡献者不对使用者的任何不当或违法行为承担责任。**
-2. **NSFW（18+）敏感内容声明**
-   - 图库中包含部分成人向 3D 素体姿势（全身单人・性感系、双人缠绵）及性感/内衣穿搭参考，旨在服务插画师与创作者的人体动态与光影练习。
-   - 站点与插件默认开启 **「安全模式 (SFW)」** 屏蔽上述分类；**未满 18 周岁的未成年人严禁关闭安全模式或访问相关内容**。
-3. **数据来源与版权归属声明**
-   - 本仓库原有姿势（`ai-pose-gallery.pages.dev`）、服装（`ai-costume-gallery.pages.dev`）、人像（`ai-portrait-gallery.pages.dev`，CC0 1.0 协议）图片与原始数据的著作权归原作者 **ギア（@giaaibusi）** 所有。
-   - 本仓库仅为中文本地化翻译与前端工程实践存档，不对原始图片主张任何权利，**严禁任何人将本仓库图片提取后进行商业倒卖或付费分发**。若原作者对镜像存档有任何异议，请联系维护者立即处理。
-4. **开源协议**
-   - 前端应用代码（`src/`）、ComfyUI 插件（`comfyui_plugin/`）与数据处理脚本（`scripts/`）以 [MIT 协议](LICENSE) 开源；该协议**不覆盖** `img/`、`thumbs/` 与 `data/` 中的图片及原始数据。
+1. **Lawful use and learning purposes (no illegal use)**
+   - This project (the frontend workbench, ComfyUI plugin, workflow templates and agent skills) is **for personal study, human anatomy research, drawing pose reference and technical exchange only**.
+   - **Any unlawful use is strictly prohibited**, including generating, producing or spreading obscene or pornographic material, violent or terrorist content, or false or illegal information, and using real people's photos for face-swapping or deepfake synthesis without their explicit authorization, infringing portrait, privacy or reputation rights.
+   - This workbench is a purely frontend / local tool. Every AI generation request runs through a cloud API the user configures, or the user's own local ComfyUI. The platform collects and stores none of the images users upload or generate. **Users bear full legal responsibility for their uploaded materials and generated content; the repository's authors and contributors accept no responsibility for any improper or unlawful use.**
+2. **NSFW (18+) content statement**
+   - The galleries include some adult 3D mannequin poses (full-body solo, sexy; two-person) and sexy / lingerie outfit references, intended for illustrators and creators practicing human motion and light and shadow.
+   - The site and plugin enable **Safe Mode (SFW)** by default, which blocks those categories. **Anyone under 18 must not turn Safe Mode off or access that content.**
+3. **Data sources and copyright**
+   - Copyright in the original pose (`ai-pose-gallery.pages.dev`), costume (`ai-costume-gallery.pages.dev`) and portrait (`ai-portrait-gallery.pages.dev`, CC0 1.0) images and original data in this repository belongs to the original author **Gia (@giaaibusi)**.
+   - This repository is a localization and frontend engineering archive; it claims no rights over the original images. **Extracting images from this repository for commercial resale or paid distribution is strictly prohibited.** If the original author objects to this mirror archive, please contact the maintainer and it will be dealt with immediately.
+4. **Open source license**
+   - The frontend application code (`src/`), the ComfyUI plugin (`comfyui_plugin/`) and the data processing scripts (`scripts/`) are open source under the [MIT license](LICENSE); that license **does not cover** the images and original data in `img/`, `thumbs/` and `data/`.

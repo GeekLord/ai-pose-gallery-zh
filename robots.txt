@@ -1,4 +1,2 @@
 User-agent: *
 Allow: /
-
-Sitemap: https://ai-pose-gallery.anhao.app/sitemap.xml
